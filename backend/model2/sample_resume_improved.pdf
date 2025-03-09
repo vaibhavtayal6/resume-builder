@@ -1,0 +1,82 @@
+VAIBHAV TAYAL
+9252480742 | vishutayal8033@gmail.com
+www.linkedin.com/in/vaibhavtayal | https://www.github.com/vaibhavtayal6
+EDUCATION
+B.Tech in Computer Science CGPA: 3.4/4.0 2022-Present
+-Mukesh Patel School of Technology, Management and Engineering
+Senior Secondary (CBSE) Percentage: 90% 2021- 2022
+Secondary (CBSE) Percentage: 89% 2019-2020
+PROFESSIONAL SUMMARY
+● A versatile software developer with strong expertise in full-stack web development, backend systems,
+and cloud infrastructure.
+● Experienced in building scalable applications, managing databases, and utilizing cloud services.
+● Proficient in containerization and dedicated to integrating innovative technologies, with a passion for
+UAVs and their practical applications.
+● Seeking opportunities to contribute to dynamic projects in a collaborative environment
+TECHNICAL SKILLS
+● Programming Languages: C/C++, Python ● Database Management System
+● Development: HTML, CSS, JavaScript, React, ● Deployment: AWS (Cloudflare, S3,
+NextJS, NodeJS, Tailwind, Prisma, EC2) , github deployment
+PostgreSQL, NextAuth, Monorepo, Terborepo ● VSCode, Docker, Anaconda, Mongoose ,
+● Data Structures and Algorithms Express ,JWT
+PROJECTS
+● Salary Management System[GitHub] 2024
+(Vue.js, JavaScript, Flask, MySQL)
+• Developed a comprehensive Payroll software system to manage employee information and automate
+salary processes for micro businesses .
+• Implemented dynamic salary bifurcation and bonus calculation, allowing for flexible
+percentage-based allowances like HRA and other bonuses.
+• Enabled administrators to define and adjust salary structures easily, enhancing the efficiency and
+accuracy of payroll management across the company.
+● Payment Wallet System[GitHub] 2024
+(Node.js, Express, Mongoose, JWT, React, Tailwind)
+• Developed a user-friendly payment wallet with features for signup and signin, enabling users to
+access a dashboard with a friend list for sending and receiving dummy money.
+• Implemented secure authentication and authorization using JWT tokens to ensure user data protection.
+• Built the backend for efficient data handling and the frontend for a seamless user experience.
+● Blogify - Blogging Platform 2024
+(React, Cloudflare Worker, TypeScript, Zod, Prisma ORM, PostgreSQL, JWT)
+• Frontend: Developed an intuitive and responsive UI using React, providing users with a seamless blogging
+experience.
+• Backend: Built with Cloudflare Worker, ensuring a fast and scalable serverless environment for the
+application.
+• TypeScript and Type Inference: Leveraged TypeScript to ensure type safety and enhance code reliability
+across the frontend and backend.
+• Validation and Security: Implemented Zod for strict validation, ensuring data integrity, and JWT
+authentication for secure user management.
+• Database: Employed Prisma ORM for efficient database operations with PostgreSQL, including connection
+pooling for optimal performance.
+• Features: Includes user authentication, post creation, editing, deletion, and comment functionality,
+similar to Medium’s core features.
+● Automated Tree Counting for Sustainable Agriculture using Hexacopter 2024
+(Mechanical Design, Electronics, UAV Systems, Jetson Nano, YOLO v5s, Python)
+• Led the mechanical and electronic integration for the hexacopter, ensuring smooth communication
+between the Jetson Nano and camera for real-time data processing.
+• Optimized camera resolution for precise imagery and improved tree detection using a YOLO v5s model.
+• Developed and fine-tuned the YOLO v5s model, ensuring accurate tree detection and efficient UAV
+operation.
+• Enhanced system reliability and reduced costs by streamlining the UAV's performance for effective
+agricultural management.
+● Inventory Management System (Dronelog)[GitHub] 2023
+(Python, Mission Planner , Node.js , ROS , OpenCV)
+ Developed an advanced inventory management system that detects missing items, significantly enhancing
+overall warehouse efficiency.
+ Used a quadcopter, Raspberry Pi, and camera, focusing on precise indoor positioning to ensure accurate
+location tracking within a warehouse.
+ Utilized ArUco markers and ROS for bin identification and QR code scanning for generating detailed
+● Aerial Medical Delivery System - VTOL Aircraft 2023
+(Mechanical Design, Electronics, VTOL Integration, Mission Planner, Python)
+• Led the mechanical design and electronics integration for a VTOL aircraft designed to deliver emergency
+medical supplies between Dhule and our college.
+• Designed and assembled propulsion systems, flight control mechanisms, and power management for
+reliable operations.
+• Integrated sensors, motors, and ESCs for seamless communication and stable flight control.
+• Collaborated with the team to ensure optimal performance and adherence to milestones for timely
+medicine delivery.
+Positions of Responsibility
+● Captain of UAS Team (drone club of our university) 2024-present
+● Technical Head of Ambiora, the annual fest of college 2023
+Achievements
+● Among top 5 national teams at IIT Bombay Techfest in DroneLog competition. 2023
+● Secured 3rd position among 25+teams in Pune AISSMS Drone Racing Competition 2023
+● Won 2nd prize in SVNIT Annual Technical Fest for autonomous drone racing. 2023
