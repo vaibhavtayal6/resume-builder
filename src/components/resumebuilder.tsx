@@ -1,11 +1,14 @@
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import ChatMessage from "./chat-message"
-import ResumePreview from "./resumepreview"
-import Sidebar from "./ui/sidebar"
-import { Send, Code, Layout, Palette, Database, Settings } from "lucide-react"
-
+import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import ChatMessage from "./chat-message";
+import ResumePreview from "./resumepreview";
+import CoverLetterGenerator from "./CoverLetterGeneration";
+import Sidebar from "./ui/sidebar";
+import { Send, Code, Layout, Palette, Database, Settings, FileText, FileCode, File } from "lucide-react";
+import MinimalTemplate from "./ResumeTemplates/MinimalTemplate";
+import ModernTemplate from "./ResumeTemplates/ModernTemplate";
+import TemplateSelection from './ResumeTemplates/TemplateSelection';
+import PDFButton from './PDFButton';
 // Define professional roles
 const ROLES = [
     {
@@ -39,6 +42,12 @@ const ROLES = [
         description: "Manage infrastructure and deployment pipelines",
     },
 ];
+
+// Add this after your ROLES constant
+const TEMPLATES = {
+    minimal: MinimalTemplate,
+    modern: ModernTemplate
+} as const;
 
 // General questions for all roles
 const GENERAL_QUESTIONS = [
@@ -96,23 +105,24 @@ const ROLE_SPECIFIC_QUESTIONS = {
 };
 
 type Message = {
-    id: string
-    content: string
-    role: "user" | "assistant"
-    isEditing?: boolean
-    questionIndex?: number
-}
+    id: string;
+    content: string;
+    role: "user" | "assistant";
+    isEditing?: boolean;
+    questionIndex?: number;
+};
 
 type Conversation = {
-    id: string
-    name: string
-    active: boolean
-    messages: Message[]
-    currentQuestion: number
-    resumeData: Record<number, string>
-    showPreview: boolean
-    selectedRole?: string
-}
+    id: string;
+    name: string;
+    active: boolean;
+    messages: Message[];
+    currentQuestion: number;
+    resumeData: Record<number, string>;
+    showPreview: boolean;
+    selectedRole?: string;
+    activeTab?: "resume" | "coverLetter" | "template";
+};
 
 interface ResumeBuilderProps {
     onBack: () => void;
@@ -128,16 +138,40 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
             currentQuestion: -1,
             resumeData: {},
             showPreview: false,
+            activeTab: "resume",
         },
-    ])
-    const [input, setInput] = useState("")
-    const [isGenerating, setIsGenerating] = useState(false)
-    const [showSidebar, setShowSidebar] = useState(true)
+    ]);
+    const [input, setInput] = useState("");
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(true);
+    const [selectedTemplate, setSelectedTemplate] = useState<keyof typeof TEMPLATES>("minimal");
+    const [resumeData, setResumeData] = useState({
+        name: "",
+        skills: [],
+        workExperience: [
+            {
+                title: "",
+                company: "",
+                duration: "",
+                description: "",
+            },
+        ],
+        education: [
+            {
+                degree: "",
+                institution: "",
+                year: "",
+            },
+        ],
+        certifications: [],
+        projects: [],
+        achievements: [],
+    });
 
-    const messagesEndRef = useRef<HTMLDivElement>(null)
-    const inputRef = useRef<HTMLTextAreaElement>(null)
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const activeConversation = conversations.find((c) => c.active) || conversations[0]
+    const activeConversation = conversations.find((c) => c.active) || conversations[0];
 
     const getQuestionsForRole = (roleId: string) => {
         const roleQuestions = ROLE_SPECIFIC_QUESTIONS[roleId as keyof typeof ROLE_SPECIFIC_QUESTIONS] || [];
@@ -164,36 +198,36 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
                 ],
             }));
         }
-    }, [activeConversation.id])
+    }, [activeConversation.id]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [activeConversation.messages])
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [activeConversation.messages]);
 
     useEffect(() => {
-        inputRef.current?.focus()
-    }, [activeConversation.currentQuestion])
+        inputRef.current?.focus();
+    }, [activeConversation.currentQuestion]);
 
     const updateActiveConversation = (updater: (prev: Conversation) => Conversation) => {
-        setConversations((prev) => prev.map((conv) => (conv.active ? updater(conv) : conv)))
-    }
+        setConversations((prev) => prev.map((conv) => (conv.active ? updater(conv) : conv)));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        if (!input.trim()) return
+        if (!input.trim()) return;
 
         const userMessage: Message = {
             id: Date.now().toString(),
             content: input,
             role: "user",
             questionIndex: activeConversation.currentQuestion,
-        }
+        };
 
         updateActiveConversation((prev) => ({
             ...prev,
             messages: [...prev.messages, userMessage],
-        }))
+        }));
 
         if (!activeConversation.selectedRole) {
             const selectedRole = ROLES.find(
@@ -240,19 +274,19 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
                 ...prev.resumeData,
                 [prev.currentQuestion]: input,
             },
-        }))
+        }));
 
-        setInput("")
+        setInput("");
 
         const questions = getQuestionsForRole(activeConversation.selectedRole);
 
         if (activeConversation.currentQuestion < questions.length - 1) {
-            const nextQuestion = activeConversation.currentQuestion + 1
+            const nextQuestion = activeConversation.currentQuestion + 1;
 
             updateActiveConversation((prev) => ({
                 ...prev,
                 currentQuestion: nextQuestion,
-            }))
+            }));
 
             setTimeout(() => {
                 const assistantMessage: Message = {
@@ -260,34 +294,35 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
                     content: questions[nextQuestion],
                     role: "assistant",
                     questionIndex: nextQuestion,
-                }
+                };
 
                 updateActiveConversation((prev) => ({
                     ...prev,
                     messages: [...prev.messages, assistantMessage],
-                }))
-            }, 500)
+                }));
+            }, 500);
         } else {
-            setIsGenerating(true)
+            setIsGenerating(true);
 
             setTimeout(() => {
-                setIsGenerating(false)
+                setIsGenerating(false);
 
                 const finalMessage: Message = {
                     id: Date.now().toString(),
                     content:
-                        "Thanks for providing all the information! I've generated your resume. You can view and download it below.",
+                        "Thanks for providing all the information! I've generated your resume. You can view and download it below. You can also create a customized cover letter using your resume data.",
                     role: "assistant",
-                }
+                };
 
                 updateActiveConversation((prev) => ({
                     ...prev,
                     messages: [...prev.messages, finalMessage],
                     showPreview: true,
-                }))
-            }, 2000)
+                    activeTab: "resume",
+                }));
+            }, 2000);
         }
-    }
+    };
 
     const resetChat = () => {
         updateActiveConversation((prev) => ({
@@ -297,11 +332,12 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
             resumeData: {},
             showPreview: false,
             selectedRole: undefined,
-        }))
-    }
+            activeTab: "resume",
+        }));
+    };
 
     const startNewChat = () => {
-        const newId = Date.now().toString()
+        const newId = Date.now().toString();
         setConversations((prev) => [
             ...prev.map((conv) => ({ ...conv, active: false })),
             {
@@ -312,67 +348,199 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
                 currentQuestion: -1,
                 resumeData: {},
                 showPreview: false,
+                activeTab: "resume",
             },
-        ])
-    }
+        ]);
+    };
 
     const deleteChat = (id: string) => {
-        if (conversations.length <= 1) return
+        if (conversations.length <= 1) return;
 
-        const isActive = conversations.find((c) => c.id === id)?.active
+        const isActive = conversations.find((c) => c.id === id)?.active;
 
         setConversations((prev) => {
-            const filtered = prev.filter((conv) => conv.id !== id)
+            const filtered = prev.filter((conv) => conv.id !== id);
 
             if (isActive && filtered.length > 0) {
-                filtered[0].active = true
+                filtered[0].active = true;
             }
 
-            return filtered
-        })
-    }
+            return filtered;
+        });
+    };
 
     const selectChat = (id: string) => {
-        setConversations((prev) => prev.map((conv) => ({ ...conv, active: conv.id === id })))
-    }
+        setConversations((prev) => prev.map((conv) => ({ ...conv, active: conv.id === id })));
+    };
 
     const toggleMessageEdit = (id: string) => {
         updateActiveConversation((prev) => ({
             ...prev,
             messages: prev.messages.map((msg) => (msg.id === id ? { ...msg, isEditing: !msg.isEditing } : msg)),
-        }))
-    }
+        }));
+    };
 
     const updateMessage = (id: string, newContent: string) => {
         updateActiveConversation((prev) => {
             const updatedMessages = prev.messages.map((msg) => {
                 if (msg.id === id) {
-                    return { ...msg, content: newContent, isEditing: false }
+                    return { ...msg, content: newContent, isEditing: false };
                 }
-                return msg
-            })
+                return msg;
+            });
 
-            const updatedMsg = updatedMessages.find((m) => m.id === id)
-            const updatedResumeData = { ...prev.resumeData }
+            const updatedMsg = updatedMessages.find((m) => m.id === id);
+            const updatedResumeData = { ...prev.resumeData };
 
             if (updatedMsg?.role === "user" && updatedMsg.questionIndex !== undefined) {
-                updatedResumeData[updatedMsg.questionIndex] = newContent
+                updatedResumeData[updatedMsg.questionIndex] = newContent;
             }
 
             return {
                 ...prev,
                 messages: updatedMessages,
                 resumeData: updatedResumeData,
-            }
-        })
-    }
+            };
+        });
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSubmit(e)
+            e.preventDefault();
+            handleSubmit(e);
         }
-    }
+    };
+
+    // Function to switch between resume, cover letter, and template tabs
+    const switchTab = (tab: "resume" | "coverLetter" | "template") => {
+        updateActiveConversation((prev) => ({
+            ...prev,
+            activeTab: tab,
+        }));
+    };
+
+    // Format resume data for the cover letter generator
+    const formatResumeData = () => {
+        const questions = activeConversation.selectedRole
+            ? getQuestionsForRole(activeConversation.selectedRole)
+            : [];
+
+        // Basic structure for resume data
+        const formattedData = {
+            name: activeConversation.resumeData[0] || "", // Assuming first question is name
+            skills: [],
+            workExperience: [
+                {
+                    title: "",
+                    company: "",
+                    duration: "",
+                    description: "",
+                },
+            ],
+            education: [
+                {
+                    degree: "",
+                    institution: "",
+                    year: "",
+                },
+            ],
+            certifications: [],
+            projects: [],
+            achievements: [],
+        };
+
+        // Find skill-related question index and extract skills
+        const skillsQuestionIndex = questions.findIndex(
+            (q) => q.includes("soft skills") || q.includes("proficient in")
+        );
+        if (skillsQuestionIndex >= 0 && activeConversation.resumeData[skillsQuestionIndex]) {
+            formattedData.skills = activeConversation.resumeData[skillsQuestionIndex]
+                .split(",")
+                .map((skill) => skill.trim());
+        }
+
+        // Find education-related question index
+        const educationQuestionIndex = questions.findIndex((q) => q.includes("educational background"));
+        if (educationQuestionIndex >= 0 && activeConversation.resumeData[educationQuestionIndex]) {
+            const eduText = activeConversation.resumeData[educationQuestionIndex];
+            // Simple parsing - this could be more sophisticated
+            const parts = eduText.split(",");
+            if (parts.length >= 2) {
+                formattedData.education[0] = {
+                    degree: parts[0].trim(),
+                    institution: parts[1].trim(),
+                    year: parts[2]?.trim() || "",
+                };
+            }
+        }
+
+        // Find work experience question
+        const workQuestionIndex = questions.findIndex(
+            (q) =>
+                q.includes("challenging technical project") ||
+                q.includes("successful product") ||
+                q.includes("experience with")
+        );
+
+        if (workQuestionIndex >= 0 && activeConversation.resumeData[workQuestionIndex]) {
+            formattedData.workExperience[0] = {
+                title: ROLES.find((r) => r.id === activeConversation.selectedRole)?.title || "",
+                company: "Previous Company",
+                duration: "2022-2024",
+                description: activeConversation.resumeData[workQuestionIndex],
+            };
+        }
+
+        // Find certifications
+        const certQuestionIndex = questions.findIndex((q) => q.includes("certifications"));
+        if (certQuestionIndex >= 0 && activeConversation.resumeData[certQuestionIndex]) {
+            formattedData.certifications = activeConversation.resumeData[certQuestionIndex]
+                .split(",")
+                .map((cert) => cert.trim());
+        }
+
+        return formattedData;
+    };
+
+    const handleTemplateChange = (template: keyof typeof TEMPLATES) => {
+        setSelectedTemplate(template);
+    };
+
+    const handleResumeDataChange = (newData: any) => {
+        setResumeData(newData);
+    };
+
+    const TemplateComponent = TEMPLATES[selectedTemplate];
+
+    // Add this function after your existing imports
+    const formatResumeDataForTemplate = (conversations: any[], selectedRole: string) => {
+        const messages = conversations.filter(msg => msg.role === "user");
+        
+        // Find answers to specific questions
+        const findAnswer = (keyword: string) => {
+          const message = messages.find(msg => msg.content.toLowerCase().includes(keyword));
+          return message ? message.content : '';
+        };
+      
+        // Format contact information
+        const email = findAnswer('email');
+        const phone = findAnswer('phone');
+        const contact = `${email}|${phone}`;
+      
+        return {
+          name: findAnswer('name'),
+          contact: contact,
+          title: selectedRole ? selectedRole.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()) : '',
+          education: findAnswer('education'),
+          technicalSkills: findAnswer('technical skills'),
+          softSkills: findAnswer('soft skills'),
+          recentExperience: findAnswer('recent experience'),
+          otherExperience: findAnswer('previous experience'),
+          certifications: findAnswer('certifications'),
+          summary: findAnswer('summary'),
+          projects: findAnswer('projects')
+        };
+      };
 
     return (
         <div className="flex h-full w-full bg-gradient-to-b from-zinc-900 via-zinc-900 to-black">
@@ -439,18 +607,89 @@ export default function ResumeBuilder({ onBack }: ResumeBuilderProps) {
 
                 {activeConversation.showPreview && (
                     <div className="lg:w-1/2 h-full overflow-y-auto border-l border-zinc-800">
+                        <div className="flex border-b border-zinc-800">
+                            <button
+                                className={`flex-1 py-3 px-4 ${
+                                    activeConversation.activeTab === "resume"
+                                        ? "bg-zinc-800 text-white"
+                                        : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800/50"
+                                }`}
+                                onClick={() => switchTab("resume")}
+                            >
+                                <div className="flex items-center justify-center space-x-2">
+                                    <FileText className="h-4 w-4" />
+                                    <span>Resume</span>
+                                </div>
+                            </button>
+                            <button
+                                className={`flex-1 py-3 px-4 ${
+                                    activeConversation.activeTab === "coverLetter"
+                                        ? "bg-zinc-800 text-white"
+                                        : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800/50"
+                                }`}
+                                onClick={() => switchTab("coverLetter")}
+                            >
+                                <div className="flex items-center justify-center space-x-2">
+                                    <FileCode className="h-4 w-4" />
+                                    <span>Cover Letter</span>
+                                </div>
+                            </button>
+                            <button
+                                className={`flex-1 py-3 px-4 ${
+                                    activeConversation.activeTab === "template"
+                                        ? "bg-zinc-800 text-white"
+                                        : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800/50"
+                                }`}
+                                onClick={() => switchTab("template")}
+                            >
+                                <div className="flex items-center justify-center space-x-2">
+                                    <File className="h-4 w-4" />
+                                    <span>Template</span>
+                                </div>
+                            </button>
+                        </div>
+
                         <div className="p-6">
-                            <ResumePreview
-                                resumeData={activeConversation.resumeData}
-                                questions={
-                                    activeConversation.selectedRole
-                                        ? getQuestionsForRole(activeConversation.selectedRole)
-                                        : []
-                                }
-                                role={
-                                    ROLES.find((r) => r.id === activeConversation.selectedRole)?.title
-                                }
-                            />
+                            {activeConversation.activeTab === "resume" ? (
+                                <ResumePreview
+                                    resumeData={activeConversation.resumeData}
+                                    questions={
+                                        activeConversation.selectedRole
+                                            ? getQuestionsForRole(activeConversation.selectedRole)
+                                            : []
+                                    }
+                                    role={
+                                        ROLES.find((r) => r.id === activeConversation.selectedRole)?.title
+                                    }
+                                />
+                            ) : activeConversation.activeTab === "coverLetter" ? (
+                                <div className="bg-zinc-800/50 rounded-lg p-6">
+                                    <h2 className="text-xl font-bold mb-4 text-white">Cover Letter Generator</h2>
+                                    <CoverLetterGenerator resumeData={formatResumeData()} />
+                                </div>
+                            ) : (
+                                <div className="bg-zinc-800/50 rounded-lg p-6">
+                                    <h2 className="text-xl font-bold mb-4 text-white">Select a Template</h2>
+                                    <TemplateSelection
+                                        selectedTemplate={selectedTemplate}
+                                        onTemplateChange={(template) => handleTemplateChange(template as keyof typeof TEMPLATES)}
+                                    />
+                                    <div id="resume-preview" className="border p-4 mt-4 bg-white shadow">
+                                        <TemplateComponent 
+                                            resumeData={formatResumeDataForTemplate(
+                                                activeConversation.messages,
+                                                activeConversation.selectedRole
+                                            )} 
+                                        />
+                                    </div>
+                                    <PDFButton 
+                                        resumeData={formatResumeDataForTemplate(
+                                            activeConversation.messages,
+                                            activeConversation.selectedRole
+                                        )} 
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

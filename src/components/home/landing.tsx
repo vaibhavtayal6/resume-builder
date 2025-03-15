@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, FileText, Sparkles, Zap, CheckCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -18,17 +21,23 @@ function App() {
     };
   }, []);
 
-    function onATSCheck(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-        throw new Error('Function not implemented.');
-    }
+  const onStart = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    // Navigate to the resume generation page using Next.js router
+    router.push('/generate-resume');
+  };
 
-    function onStart(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-        throw new Error('Function not implemented.');
-    }
+  const onATSCheck = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    // Navigate to the ATS checker page using Next.js router
+    router.push('/ats-checker');
+  };
 
-    function onUpdateResume(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-        throw new Error('Function not implemented.');
-    }
+  const onUpdateResume = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    // Navigate to the resume update page using Next.js router
+    router.push('/customize-resume');
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0a0a0f]">
@@ -172,7 +181,7 @@ function App() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <span className="relative flex items-center gap-2">
-                  Update Resume <RefreshCw className="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
+                  Skill Scout <RefreshCw className="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
                 </span>
               </button>
               </Link>
