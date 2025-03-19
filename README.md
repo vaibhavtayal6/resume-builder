@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Resume Builder
 
-## Getting Started
+Resume Builder is a web application designed to help users create professional resumes effortlessly. Leveraging modern web technologies, it offers a seamless and intuitive experience for crafting personalized resumes.
 
-First, run the development server:
+Features
 
-```bash
+User-Friendly Interface: Simplifies the resume creation process with an intuitive design.
+
+Customizable Templates: Offers a variety of templates to suit different professional needs.
+
+Real-Time Preview: Allows users to see changes in real-time as they edit their resumes.
+
+AI-Powered Cover Letter Generation: Dynamically generates a tailored cover letter based on the company and role the user is applying for, utilizing key details from the resume.
+
+Technologies Used
+
+Frontend: React.js with Next.js framework
+
+Styling: Tailwind CSS
+
+Backend: Node.js with Express.js
+
+Database: MongoDB
+
+AI Integration: GPT-based model for cover letter generation
+
+Getting Started
+
+To set up the project locally, follow these steps:
+
+1. Clone the Repository
+
+git clone https://github.com/vaibhavtayal6/resume-builder.git
+cd resume-builder
+
+2. Install Dependencies and Start the Servers
+
+Frontend Setup
+
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be accessible at http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Backend Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Navigate to the backend folder and install dependencies:
 
-## Learn More
+cd backend
+npm install
+npm run start
 
-To learn more about Next.js, take a look at the following resources:
+This is necessary for AI-based cover letter generation and other backend functionalities.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+How the Cover Letter Generation Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+User fills in resume details (Name, Experience, Skills, etc.).
 
-## Deploy on Vercel
+Inputs Company Name & Role they are applying for.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+AI dynamically generates a tailored cover letter based on the resume data.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+User reviews and customizes before finalizing.
+
+Contributing
+
+Contributions are welcome! Please fork the repository and create a pull request with your changes. Ensure that your code adheres to the project's coding standards and includes appropriate tests.
+
+License
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
+
+Acknowledgments
+
+Thanks to the open-source community for the tools and resources that made this project possible.
+
+Special mention to miracle5284 for inspiration and guidance.
