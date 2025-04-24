@@ -45,9 +45,10 @@ Navigate to the backend folder and install dependencies:
 
 ```bash
 cd backend
-npm install
-npm run start
+pip install fastapi uvicorn pdfplumber language-tool-python python-multipart
+python -m uvicorn server:app --reload --port 8000
 ```
+
 
 This is necessary for AI-based cover letter generation and other backend functionalities.
 
